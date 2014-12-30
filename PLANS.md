@@ -9,6 +9,7 @@ Game Engine
 - 2D Physics
 - Networking
 - Threading
+- Timer
 
 Main Loop
 ---------
@@ -51,4 +52,12 @@ PACKET:
 
 See Gaffer on Games tutorials to understand:
 http://gafferongames.com/networking-for-game-programmers/reliability-and-flow-control/
+
+Timer
+-----
+
+- Global game time
+- Running game time
+- Frame time
+
 
