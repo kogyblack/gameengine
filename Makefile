@@ -1,14 +1,18 @@
 # C++ Compiler
-CXX=g++
-CXXFLAGS=-c -Wall -std=c++11
+CXX = g++
+CXXFLAGS = -c -Wall -std=c++11
 LDFLAGS = $(addprefix -l,$(LIBS))
 
 SOURCES := $(wildcard src/*.cpp)
 
 VPATH := src
 
-OBJECTS := $(addprefix obj/,$(notdir $(SOURCES:.cpp=.o)))
-EXECUTABLE = bin/VSGE.out
+OBJDIR := obj
+OBJECTS := $(addprefix $(OBJDIR)/,$(notdir $(SOURCES:.cpp=.o)))
+
+BUILDDIR := build
+EXENAME := VSGE
+EXECUTABLE := $(addsuffix .out,$(addprefix $(BUILDDIR)/,$(EXENAME)))
 
 LIBS := SDL2
 
@@ -17,21 +21,25 @@ debug: $(SOURCES) $(EXECUTABLE)
 release: CXX += -DSDL_ASSERT_LEVEL=1
 release: $(SOURCES) $(EXECUTABLE)
 
-$(EXECUTABLE): $(OBJECTS)
+$(EXECUTABLE): $(OBJECTS) | $(BUILDDIR)
 	$(CXX) $^ $(LDFLAGS) -o $@
 
 $(OBJECTS): | obj
 
-.PHONY: obj
-obj:
+.PHONY: $(BUILDDIR)
+$(BUILDDIR):
 	@mkdir -p $@
 
-obj/%.o: %.cpp
+.PHONY: $(OBJDIR)
+$(OBJDIR):
+	@mkdir -p $@
+
+$(OBJDIR)/%.o: %.cpp
 	$(CXX) $< $(CXXFLAGS) -o $@
 
 .PHONY: clean
 clean:
-	@- $(RM) -R obj $(EXECUTABLE)
+	@- $(RM) -R $(OBJDIR) $(BUILDDIR)
 
 rebuild:
 	@make clean --no-print-directory
