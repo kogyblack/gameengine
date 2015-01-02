@@ -26,3 +26,9 @@
 *.exe
 *.out
 *.app
+
+# Builds
+build/
+
+# Objects
+obj/
