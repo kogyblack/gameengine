@@ -2,9 +2,8 @@
  * Very Simple Game Engine
  */
 
-#include <iostream>
-
-#include <SDL2/SDL.h>
+// IDEA(naum): Rename SDL elements into VSGE elements
+// e.g.: SDL_Event -> vsge::Event
 
 #include "game.h"
 
