@@ -1,6 +1,9 @@
 // TODO(naum): Change cerr to logging
 #include <iostream>
 
+// TODO(naum): Remove transcendental functions and reimplement them
+#include <cmath>
+
 #include "game.h"
 
 namespace vsge
@@ -25,7 +28,7 @@ start(std::string name,
                SDL_INIT_JOYSTICK |
                SDL_INIT_GAMECONTROLLER |
                SDL_INIT_HAPTIC |
-               // TODO(naum): Separate Audio into another class
+               // TODO(naum): Put Audio into another class
                SDL_INIT_AUDIO) != 0)
   {
     SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "SDL could not init: %s\n", SDL_GetError());
@@ -76,6 +79,73 @@ start(std::string name,
   for (int x = 0; x < SCREEN_WIDTH; ++x)
     for (int y = 0; y < SCREEN_HEIGHT; ++y)
       backbufferPixels_[y * SCREEN_WIDTH + x] = ((y % 256) << 8) + (x % 256);
+
+  // Audio
+  // TODO(naum): Create a class for audio
+  SDL_AudioSpec audioWant = {};
+  SDL_AudioSpec audioHave;
+  SDL_AudioDeviceID audioDevice;
+
+  audioWant.freq = 48000;
+  //audioWant.format = AUDIO_S16MSB; // NOTE(naum): Must be big-endian (why?)
+  audioWant.format = AUDIO_S16LSB;
+  audioWant.channels = 2;
+  audioWant.samples = 4096;
+  audioWant.callback = [] (void* userdata, uint8* stream, int audioLength)
+  {
+    static uint32 runningSampleIndex = 0;
+
+    int samplesPerSecond = 48000;
+    int toneHz = 256;
+    int16 toneVolume = 50;
+    int wavePeriod = samplesPerSecond / toneHz;
+    int bytesPerSample = sizeof(int16) * 2;
+    int sampleCount = audioLength / bytesPerSample;
+
+    int16* audioStream = reinterpret_cast<int16*>(stream);
+    for (int i = 0; i < sampleCount; ++i)
+    {
+      int16 sampleValue = 0;
+
+      // NOTE(naum): Sine wave
+      float angle = 2 * M_PI * runningSampleIndex++ / wavePeriod;
+      while (angle >= 2 * M_PI)
+        angle -= 2 * M_PI;
+      float sineValue = std::sin(angle);
+      sampleValue = static_cast<int16>(sineValue * toneVolume);
+
+      // NOTE(naum): Square wave
+      /*
+      int halfWavePeriod = wavePeriod / 2;
+      sampleValue = ((runningSampleIndex++ / halfWavePeriod) % 2)
+        ? toneVolume : -toneVolume;
+      */
+
+      //*audioStream++ = sampleValue;
+      //*audioStream++ = sampleValue;
+      *stream++ = (sampleValue & 0xFF00) >> 16;
+      *stream++ = (sampleValue & 0x00FF);
+
+      *stream++ = (sampleValue & 0xFF00) >> 16;
+      *stream++ = (sampleValue & 0x00FF);
+    }
+  };
+  audioWant.userdata = 0;
+
+  audioDevice = SDL_OpenAudioDevice(
+      NULL, 0,
+      &audioWant, &audioHave,
+      SDL_AUDIO_ALLOW_FORMAT_CHANGE);
+
+  if (audioDevice == 0)
+    std::cout << "Failed to open audio: " << SDL_GetError() << std::endl;
+  else
+  {
+    if (audioHave.format != audioWant.format)
+      std::cout << "Could not get the wanted audio format!" << std::endl;
+    SDL_PauseAudioDevice(audioDevice, 0);
+  }
+
 
   // Success
   return true;
