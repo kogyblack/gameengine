@@ -26,6 +26,7 @@ const int SCREEN_HEIGHT = 480;
   TODO(naum): Todo-list of Game class
   - Fix framerate (Create Timer class)
   - Window: Change resolution
+  - Window: Enable fullscreen
   - Renderer: Enable vsync
   - Network
   - Physics
@@ -69,6 +70,7 @@ private:
   void handleKeyboard(SDL_Event event);
   void handleMouse(SDL_Event event);
   void handleJoysticks(SDL_Event event);
+  void handleControllers(SDL_Event event);
 
   /**
    * Render method
@@ -76,6 +78,9 @@ private:
    */
   void render();
 
+  /**
+   * Game running flag
+   */
   bool isRunning_ = true;
 
   /**

@@ -147,6 +147,11 @@ start(std::string name,
   }
 
 
+
+  // Joystick
+  // TODO(naum): Just add mappings if necessary
+  SDL_GameControllerAddMappingsFromFile("gamecontrollerdb.txt");
+
   // Success
   return true;
 }
@@ -198,6 +203,7 @@ handleInputs()
     handleKeyboard(event);
     handleMouse(event);
     handleJoysticks(event);
+    handleControllers(event);
   }
 }
 
@@ -207,6 +213,7 @@ handleKeyboard(SDL_Event event)
   // Keyboard support
   // TODO(naum): Gather all information and handle
   // elsewhere. This should be only the API
+  // TODO(naum): Keypresses
   if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP)
   {
     auto key = event.key;
@@ -230,6 +237,7 @@ handleMouse(SDL_Event event)
 {
   // Mouse support
   // NOTE(naum): Can support multiple mice
+  // TODO(naum): Mouse state
   if (event.type == SDL_MOUSEMOTION)
   {
   }
@@ -248,31 +256,45 @@ void Game::
 handleJoysticks(SDL_Event event)
 {
   // Joystick Support
+  // TODO(naum): Joystick state
   if (event.type == SDL_JOYDEVICEADDED)
   {
+    // NOTE(naum): Joystick will increment device ID even if it's the
+    // same joystick. This was fixed (saw on revision) in SDL 2.0.4.
     auto jdevice = event.jdevice;
-    std::cout << "Joystick connected: "
-      << jdevice.which
-      << std::endl;
+    auto which = jdevice.which;
+    // TODO(naum): Change to Log class
+    SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION,
+                "Joystick connected: %s\n",
+                SDL_JoystickNameForIndex(which));
+
+    // TODO(naum): Change to Log class
+    if (!SDL_IsGameController(which))
+      SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
+                  "Joystick is not game controller!\n");
 
     // TODO(naum): Add support for new controller
+    // TODO(naum): Only open joystick if game controller not available
+    //joystick = SDL_JoystickOpen(which);
+    //gameController = SDL_GameControllerOpen(which);
   }
 
   if (event.type == SDL_JOYDEVICEREMOVED)
   {
-    SDL_JoystickUpdate();
     auto jdevice = event.jdevice;
-    std::cout << "Joystick disconnected: "
-      << jdevice.which
-      << std::endl;
+    auto which = jdevice.which;
+    // TODO(naum): Change to Log class
+    SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION,
+                "Joystick disconnected: %d\n",
+                which);
+
     // TODO(naum): Verify if joy is in use to do what is needed
+    //SDL_JoystickClose(joystick);
   }
 
   if (event.type == SDL_JOYBUTTONDOWN ||
       event.type == SDL_JOYBUTTONUP)
   {
-    auto jbutton = event.jbutton;
-    std::cout << jbutton.which << ": " << jbutton.button << std::endl;
   }
 
   if (event.type == SDL_JOYAXISMOTION)
@@ -280,6 +302,31 @@ handleJoysticks(SDL_Event event)
   }
 
   if (event.type == SDL_JOYHATMOTION)
+  {
+  }
+}
+
+void Game::
+handleControllers(SDL_Event event)
+{
+  if (event.type == SDL_CONTROLLERDEVICEADDED)
+  {
+  }
+
+  if (event.type == SDL_CONTROLLERDEVICEREMOVED)
+  {
+  }
+
+  if (event.type == SDL_CONTROLLERDEVICEREMAPPED)
+  {
+  }
+
+  if (event.type == SDL_CONTROLLERBUTTONDOWN ||
+      event.type == SDL_CONTROLLERBUTTONUP)
+  {
+  }
+
+  if (event.type == SDL_CONTROLLERAXISMOTION)
   {
   }
 }
