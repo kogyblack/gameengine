@@ -20,6 +20,7 @@ namespace vsge
 
 // Forward declarations
 class Renderer;
+class Audio;
 
 const int SCREEN_WIDTH  = 640;
 const int SCREEN_HEIGHT = 480;
@@ -91,6 +92,7 @@ private:
 
   Renderer* renderer_; /**< Window renderer */
 
+  Audio* audio_; /**< Audio */
 
   // TODO(naum): Remove this backbuffer texture
   SDL_Texture* backbuffer_;
