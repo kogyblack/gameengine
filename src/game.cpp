@@ -1,10 +1,8 @@
-// TODO(naum): Change cerr to logging
+// TODO(naum): Remove cout/cerr and implement logging
 #include <iostream>
 
-// TODO(naum): Remove transcendental functions and reimplement them
-#include <cmath>
-
 #include "game.h"
+#include "renderer.h"
 
 namespace vsge
 {
@@ -53,22 +51,19 @@ start(std::string name,
   // TODO(naum): Set VSync and linear interpolation
 
   // Renderer instantiation
-  renderer_ = SDL_CreateRenderer(
-        window_,
-        -1,
-        SDL_RENDERER_ACCELERATED);
+  renderer_ = new Renderer {window_};
 
-  if (!renderer_)
+  if (!renderer_->isInit())
   {
     SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Renderer could not be created: %s\n", SDL_GetError());
     return false;
   }
 
-  SDL_SetRenderDrawColor(renderer_, 0xff, 0xff, 0xff, 0xff);
-  SDL_RenderClear(renderer_);
+  renderer_->swapBuffers();
 
   // TODO(naum): Don't use a texture as backbuffer (?)
   // Create Backbuffer
+  /*
   backbuffer_ = SDL_CreateTexture(
       renderer_,
       SDL_PIXELFORMAT_ARGB8888,
@@ -79,6 +74,7 @@ start(std::string name,
   for (int x = 0; x < SCREEN_WIDTH; ++x)
     for (int y = 0; y < SCREEN_HEIGHT; ++y)
       backbufferPixels_[y * SCREEN_WIDTH + x] = ((y % 256) << 8) + (x % 256);
+  */
 
   // Audio
   // TODO(naum): Create a class for audio
@@ -162,12 +158,12 @@ Game::
   if (window_)
     SDL_DestroyWindow(window_);
 
-  if (renderer_)
-    SDL_DestroyRenderer(renderer_);
-
   // TODO(naum): Remove this when we remove the texture as backbuffer
+  /*
+  SDL_DestroyTexture(backbuffer_);
   if (backbufferPixels_)
     delete backbufferPixels_;
+  */
 
   SDL_Quit();
 }
@@ -335,12 +331,13 @@ void Game::
 render()
 {
   // TODO(naum): Don't use this backbuffer texture
+  /*
   SDL_UpdateTexture(backbuffer_, 0, backbufferPixels_, SCREEN_WIDTH * sizeof(uint32));
   SDL_RenderCopy(renderer_, backbuffer_, 0, 0);
+  */
 
   // Swap buffers and clear the backbuffer
-  SDL_RenderPresent(renderer_);
-  SDL_RenderClear(renderer_);
+  renderer_->swapBuffers();
 }
 
 void Game::

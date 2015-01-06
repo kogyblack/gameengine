@@ -18,6 +18,9 @@
 namespace vsge
 {
 
+// Forward declarations
+class Renderer;
+
 const int SCREEN_WIDTH  = 640;
 const int SCREEN_HEIGHT = 480;
 
@@ -43,12 +46,15 @@ public:
   Game();
   virtual ~Game();
 
+  /**
+   * Create window and setup the game
+   */
   bool start(std::string name,
              int window_width, int window_height,
              int argc, char** argv);
 
   /**
-   * The game main loop
+   * Game main loop
    */
   void run();
 
@@ -78,23 +84,13 @@ private:
    */
   void render();
 
-  /**
-   * Game running flag
-   */
-  bool isRunning_ = true;
+  bool isRunning_ = true; /**< game running flag */
 
-  /**
-   * The game name
-   */
-  std::string name_;
+  std::string name_; /**< Game name */
+  SDL_Window* window_; /**< Window handler */
 
-  /**
-   * The window handler
-   */
-  SDL_Window* window_;
+  Renderer* renderer_; /**< Window renderer */
 
-  // TODO(naum): Create a class to manage SDL_Renderer
-  SDL_Renderer* renderer_;
 
   // TODO(naum): Remove this backbuffer texture
   SDL_Texture* backbuffer_;
