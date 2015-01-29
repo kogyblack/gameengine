@@ -1,5 +1,0 @@
-Linux:
-SDL 2.0.0
-
-Windows:
-SDL 2.0.0
