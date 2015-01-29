@@ -37,6 +37,7 @@ Physics
 
 - AABB (Axis-Aligned Bounding Box)
 - Circular Collision
+- SAT/GJK?
 
 Networking
 ----------
